@@ -1,11 +1,26 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './controllers/app.controller';
 import { AppService } from './services/app.service';
 import { AiModule } from '../ai/ai.module';
+import { GmailIngestionModule } from '../gmail-ingestion/gmail-ingestion.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AiModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          host: config.get<string>('REDIS_HOST', '127.0.0.1'),
+          port: config.get<number>('REDIS_PORT', 6379),
+        },
+      }),
+    }),
+    AiModule,
+    GmailIngestionModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
