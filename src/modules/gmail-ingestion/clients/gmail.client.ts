@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google, type gmail_v1 } from 'googleapis';
+import { TokenStoreService } from '../../auth/services/token-store.service';
+
+type OAuth2Client = InstanceType<typeof google.auth.OAuth2>;
 
 export interface HistoryPage {
   addedMessageIds: string[];
@@ -15,28 +18,40 @@ export interface MessageIdPage {
 
 @Injectable()
 export class GmailClientService {
-  private readonly gmail: gmail_v1.Gmail;
+  private readonly oauth: OAuth2Client;
   readonly userId: string;
 
-  constructor(private readonly config: ConfigService) {
-    const auth = new google.auth.OAuth2(
+  constructor(
+    private readonly config: ConfigService,
+    private readonly tokenStore: TokenStoreService,
+  ) {
+    this.oauth = new google.auth.OAuth2(
       this.config.getOrThrow<string>('GOOGLE_CLIENT_ID'),
       this.config.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
     );
-    auth.setCredentials({
-      refresh_token: this.config.getOrThrow<string>('GOOGLE_REFRESH_TOKEN'),
-    });
-    this.gmail = google.gmail({ version: 'v1', auth });
     this.userId = this.config.get<string>('GMAIL_USER_ID', 'me');
   }
 
+  private async client(): Promise<gmail_v1.Gmail> {
+    const refreshToken = await this.tokenStore.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error('no Gmail refresh token — authorize at /auth/google');
+    }
+    this.oauth.setCredentials({ refresh_token: refreshToken });
+    return google.gmail({ version: 'v1', auth: this.oauth });
+  }
+
   async getProfileHistoryId(): Promise<string | undefined> {
-    const { data } = await this.gmail.users.getProfile({ userId: this.userId });
+    const { data } = await (
+      await this.client()
+    ).users.getProfile({ userId: this.userId });
     return data.historyId ?? undefined;
   }
 
   async listMessageIds(pageToken?: string): Promise<MessageIdPage> {
-    const { data } = await this.gmail.users.messages.list({
+    const { data } = await (
+      await this.client()
+    ).users.messages.list({
       userId: this.userId,
       pageToken,
     });
@@ -50,7 +65,9 @@ export class GmailClientService {
     startHistoryId: string,
     pageToken?: string,
   ): Promise<HistoryPage> {
-    const { data } = await this.gmail.users.history.list({
+    const { data } = await (
+      await this.client()
+    ).users.history.list({
       userId: this.userId,
       startHistoryId,
       historyTypes: ['messageAdded'],
@@ -68,7 +85,9 @@ export class GmailClientService {
   }
 
   async getRawMessage(id: string): Promise<gmail_v1.Schema$Message> {
-    const { data } = await this.gmail.users.messages.get({
+    const { data } = await (
+      await this.client()
+    ).users.messages.get({
       userId: this.userId,
       id,
       format: 'RAW',
