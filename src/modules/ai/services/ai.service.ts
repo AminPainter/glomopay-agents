@@ -23,17 +23,4 @@ export class AiService {
   model(modelId?: string): LanguageModel {
     return this.anthropic(modelId ?? this.defaultModel);
   }
-
-  webTools(domain: string) {
-    return {
-      web_search: this.anthropic.tools.webSearch_20250305({
-        maxUses: 5,
-        allowedDomains: [domain],
-      }),
-      web_fetch: this.anthropic.tools.webFetch_20250910({
-        maxUses: 5,
-        allowedDomains: [domain],
-      }),
-    };
-  }
 }

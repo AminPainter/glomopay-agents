@@ -18,15 +18,10 @@ export class SupportAgentService {
 
   private buildAgent() {
     const maxSteps = this.config.get<number>('SUPPORT_AGENT_MAX_STEPS', 12);
-    const docsDomain = this.config.get<string>(
-      'SUPPORT_AGENT_DOCS_DOMAIN',
-      'docs.glomopay.com',
-    );
 
     return new ToolLoopAgent({
       model: this.aiService.model(),
       instructions: SUPPORT_SYSTEM_PROMPT,
-      tools: this.aiService.webTools(docsDomain),
       stopWhen: stepCountIs(maxSteps),
     });
   }
