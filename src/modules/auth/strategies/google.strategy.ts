@@ -15,8 +15,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         'profile',
         'https://www.googleapis.com/auth/gmail.readonly',
       ],
-      accessType: 'offline',
-      prompt: 'consent',
     };
     super(options);
   }
