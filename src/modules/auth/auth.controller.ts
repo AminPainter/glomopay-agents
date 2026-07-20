@@ -15,13 +15,13 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   async callback(@Req() req: Request) {
     const user = req.user as { email?: string; refreshToken?: string };
-    if (!user?.refreshToken) {
+    if (!user?.refreshToken)
       return {
         status: 'no_refresh_token',
         email: user?.email,
         hint: 'Google returned no refresh token — revoke the app at myaccount.google.com/permissions and retry.',
       };
-    }
+
     await this.tokenStore.setRefreshToken(user.refreshToken);
     return { status: 'authorized', email: user.email };
   }

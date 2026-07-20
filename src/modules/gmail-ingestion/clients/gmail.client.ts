@@ -34,9 +34,9 @@ export class GmailClient {
 
   private async client(): Promise<gmail_v1.Gmail> {
     const refreshToken = await this.tokenStore.getRefreshToken();
-    if (!refreshToken) {
+    if (!refreshToken)
       throw new Error('no Gmail refresh token — authorize at /auth/google');
-    }
+
     this.oauth.setCredentials({ refresh_token: refreshToken });
     return google.gmail({ version: 'v1', auth: this.oauth });
   }

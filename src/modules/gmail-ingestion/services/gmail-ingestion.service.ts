@@ -10,13 +10,11 @@ export class GmailIngestionService {
   async ingest(): Promise<void> {
     const { ids } = await this.client.listMessageIds();
     const [id] = ids;
-    if (!id) {
-      return;
-    }
+    if (!id) return;
+
     const message = await this.client.getRawMessage(id);
-    if (!message.raw) {
-      return;
-    }
+    if (!message.raw) return;
+
     const email = Buffer.from(message.raw, 'base64url').toString('utf8');
     this.logger.log(`incoming email ${message.id ?? id}:\n${email}`);
   }
