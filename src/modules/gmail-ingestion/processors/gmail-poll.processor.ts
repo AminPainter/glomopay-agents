@@ -1,7 +1,12 @@
-import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq';
+import {
+  Processor,
+  WorkerHost,
+  InjectQueue,
+  OnWorkerEvent,
+} from '@nestjs/bullmq';
 import { Logger, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Queue } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { GmailIngestionService } from '../services/gmail-ingestion.service';
 
 export const GMAIL_POLL_QUEUE = 'gmail-poll';
@@ -29,6 +34,17 @@ export class GmailPollProcessor extends WorkerHost implements OnModuleInit {
   }
 
   async process(): Promise<void> {
+    this.logger.log('gmail poll started');
     await this.ingestion.ingest();
+  }
+
+  @OnWorkerEvent('completed')
+  onCompleted(): void {
+    this.logger.log('gmail poll completed');
+  }
+
+  @OnWorkerEvent('failed')
+  onFailed(job: Job, err: Error): void {
+    this.logger.error(`gmail poll failed (job ${job.id}): ${err.message}`);
   }
 }
