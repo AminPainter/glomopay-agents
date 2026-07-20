@@ -17,12 +17,13 @@ export class AiService {
 
   constructor(private readonly config: ConfigService) {
     this.anthropic = createAnthropic({
-      apiKey: this.config.getOrThrow<string>('ANTHROPIC_API_KEY'),
+      apiKey: this.config.getOrThrow<string>('AI_GATEWAY_API_KEY'),
+      baseURL: this.config.get<string>(
+        'AI_GATEWAY_BASE_URL',
+        'https://ag.glomopay-eng.com/v1',
+      ),
     });
-    this.defaultModel = this.config.get<string>(
-      'ANTHROPIC_MODEL',
-      'claude-opus-4-8',
-    );
+    this.defaultModel = this.config.get<string>('AI_GATEWAY_MODEL', 'kimi-k2.5');
   }
 
   model(modelId?: string): LanguageModel {
