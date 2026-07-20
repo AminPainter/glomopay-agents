@@ -17,7 +17,7 @@ export interface MessageIdPage {
 }
 
 @Injectable()
-export class GmailClientService {
+export class GmailClient {
   private readonly oauth: OAuth2Client;
   readonly userId: string;
 

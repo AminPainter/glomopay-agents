@@ -18,7 +18,7 @@ export class GmailPollProcessor extends WorkerHost implements OnModuleInit {
   constructor(
     @InjectQueue(GMAIL_POLL_QUEUE) private readonly queue: Queue,
     private readonly config: ConfigService,
-    private readonly ingestion: GmailIngestionService,
+    private readonly gmailIngestionService: GmailIngestionService,
   ) {
     super();
   }
@@ -35,7 +35,7 @@ export class GmailPollProcessor extends WorkerHost implements OnModuleInit {
 
   async process(): Promise<void> {
     this.logger.log('gmail poll started');
-    await this.ingestion.ingest();
+    await this.gmailIngestionService.ingest();
   }
 
   @OnWorkerEvent('completed')
