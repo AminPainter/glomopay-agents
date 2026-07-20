@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { generateText, stepCountIs } from 'ai';
 import { AiService } from '../../ai/services/ai.service';
-import { SUPPORT_SYSTEM_PROMPT } from './support-agent.prompt';
+import { SUPPORT_SYSTEM_PROMPT } from '../prompts/support-agent.prompt';
 
 @Injectable()
 export class SupportAgentService {
@@ -21,29 +21,16 @@ export class SupportAgentService {
     );
   }
 
-  async handleEmail(email: string): Promise<string> {
+  async draftReply(message: string): Promise<string> {
     const { text } = await generateText({
       model: this.aiService.model(),
       system: SUPPORT_SYSTEM_PROMPT,
-      prompt: email,
+      prompt: message,
       tools: this.aiService.webTools(this.docsDomain),
       stopWhen: stepCountIs(this.maxSteps),
     });
 
-    this.logger.log(`drafted reply:\n${this.mask(text)}`);
+    this.logger.log(`drafted reply:\n${text}`);
     return text;
-  }
-
-  private mask(text: string): string {
-    return text
-      .replace(
-        /\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?(\d{4})\b/g,
-        'XXXX-XXXX-XXXX-$1',
-      )
-      .replace(/\b\d{5,}(\d{4})\b/g, '••••$1')
-      .replace(
-        /\b([A-Za-z0-9._%+-])[A-Za-z0-9._%+-]*(@[A-Za-z0-9.-]+\.[A-Za-z]{2,})\b/g,
-        '$1•••$2',
-      );
   }
 }

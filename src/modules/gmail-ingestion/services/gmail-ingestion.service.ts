@@ -1,11 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { GmailClient } from '../clients/gmail.client';
+import { SupportAgentService } from '../../support-agent/services/support-agent.service';
 
 @Injectable()
 export class GmailIngestionService {
-  private readonly logger = new Logger(GmailIngestionService.name);
-
-  constructor(private readonly client: GmailClient) {}
+  constructor(
+    private readonly client: GmailClient,
+    private readonly supportAgentService: SupportAgentService,
+  ) {}
 
   async ingest(): Promise<void> {
     const { ids } = await this.client.listMessageIds();
@@ -16,6 +18,6 @@ export class GmailIngestionService {
     if (!message.raw) return;
 
     const email = Buffer.from(message.raw, 'base64url').toString('utf8');
-    this.logger.log(`incoming email ${message.id ?? id}:\n${email}`);
+    await this.supportAgentService.draftReply(email);
   }
 }
