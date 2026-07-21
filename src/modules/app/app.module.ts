@@ -15,8 +15,8 @@ import { SupportAgentModule } from '../support-agent/support-agent.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         connection: {
-          host: config.get<string>('REDIS_HOST', '127.0.0.1'),
-          port: config.get<number>('REDIS_PORT', 6379),
+          host: config.getOrThrow<string>('REDIS_HOST'),
+          port: Number(config.getOrThrow<string>('REDIS_PORT')),
         },
       }),
     }),

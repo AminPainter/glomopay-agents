@@ -24,7 +24,9 @@ export class GmailPollProcessor extends WorkerHost implements OnModuleInit {
   }
 
   async onModuleInit(): Promise<void> {
-    const every = this.config.get<number>('GMAIL_POLL_INTERVAL_MS', 300_000);
+    const every = Number(
+      this.config.getOrThrow<string>('GMAIL_POLL_INTERVAL_MS'),
+    );
     await this.queue.upsertJobScheduler(
       'gmail-poll-scheduler',
       { every },
