@@ -29,7 +29,7 @@ export class GmailClient {
       this.config.getOrThrow<string>('GOOGLE_CLIENT_ID'),
       this.config.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
     );
-    this.userId = this.config.get<string>('GMAIL_USER_ID', 'me');
+    this.userId = this.config.getOrThrow<string>('GMAIL_USER_ID');
   }
 
   private async client(): Promise<gmail_v1.Gmail> {

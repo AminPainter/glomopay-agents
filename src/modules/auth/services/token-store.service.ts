@@ -9,8 +9,8 @@ export class TokenStoreService {
 
   constructor(private readonly config: ConfigService) {
     this.redis = new Redis({
-      host: this.config.get<string>('REDIS_HOST', '127.0.0.1'),
-      port: this.config.get<number>('REDIS_PORT', 6379),
+      host: this.config.getOrThrow<string>('REDIS_HOST'),
+      port: Number(this.config.getOrThrow<string>('REDIS_PORT')),
     });
   }
 

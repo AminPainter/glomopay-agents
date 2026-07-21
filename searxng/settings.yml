@@ -1,0 +1,12 @@
+use_default_settings: true
+
+server:
+  # Local dev only — set a real secret via env/secret manager before any shared deployment.
+  secret_key: 'change-me-local-dev'
+  # Disable the anti-bot limiter so the support agent can query the JSON API.
+  limiter: false
+
+search:
+  formats:
+    - html
+    - json
