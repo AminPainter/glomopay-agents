@@ -33,6 +33,7 @@ export class SupportAgentService {
     const result = await this.agent.generate({ prompt: message });
     let text = result.text.trim();
 
+    // Agent spent its last step on a tool call and never wrote a reply; force one with tools off.
     if (!text) {
       const finalized = await generateText({
         model: this.aiService.model(),
