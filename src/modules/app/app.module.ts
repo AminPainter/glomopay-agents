@@ -5,6 +5,7 @@ import { AppController } from './controllers/app.controller';
 import { AppService } from './services/app.service';
 import { AiModule } from '../ai/ai.module';
 import { SupportAgentModule } from '../support-agent/support-agent.module';
+import { SlackModule } from '../slack/slack.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SupportAgentModule } from '../support-agent/support-agent.module';
     }),
     AiModule,
     SupportAgentModule,
+    SlackModule,
   ],
   controllers: [AppController],
   providers: [AppService],
