@@ -4,7 +4,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './controllers/app.controller';
 import { AppService } from './services/app.service';
 import { AiModule } from '../ai/ai.module';
-import { AssistantModule } from '../assistant/assistant.module';
+import { AgentsModule } from '../agents/agents.module';
 import { SlackModule } from '../slack/slack.module';
 
 @Module({
@@ -20,7 +20,7 @@ import { SlackModule } from '../slack/slack.module';
       }),
     }),
     AiModule,
-    AssistantModule,
+    AgentsModule,
     SlackModule,
   ],
   controllers: [AppController],
