@@ -4,8 +4,6 @@ import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './controllers/app.controller';
 import { AppService } from './services/app.service';
 import { AiModule } from '../ai/ai.module';
-import { AuthModule } from '../auth/auth.module';
-import { GmailIngestionModule } from '../gmail-ingestion/gmail-ingestion.module';
 import { SupportAgentModule } from '../support-agent/support-agent.module';
 
 @Module({
@@ -21,8 +19,6 @@ import { SupportAgentModule } from '../support-agent/support-agent.module';
       }),
     }),
     AiModule,
-    AuthModule,
-    GmailIngestionModule,
     SupportAgentModule,
   ],
   controllers: [AppController],
