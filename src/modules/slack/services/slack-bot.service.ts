@@ -2,6 +2,14 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { AgentRegistry } from '../../agents/services/agent-registry.service';
 import { EMPLOYEE_ASSISTANT } from '../../agents/workforce/employee-assistant/employee-assistant.agent';
 
+const ALLOWED_SLACK_USER_IDS = new Set<string>([
+  'U0857R1RB9Q', // Amin
+  'U072S2RLD4G', // Shreyas
+]);
+
+const UNAUTHORIZED_MESSAGE =
+  'I respond only to Master Amin and his product manager Shreyas';
+
 @Injectable()
 export class SlackBotService implements OnModuleInit {
   private readonly logger = new Logger(SlackBotService.name);
@@ -21,6 +29,11 @@ export class SlackBotService implements OnModuleInit {
     });
 
     this.bot.onNewMention(async (thread, message) => {
+      if (!ALLOWED_SLACK_USER_IDS.has(message.author.userId)) {
+        this.logger.warn(`ignored mention from ${message.author.userId}`);
+        await thread.post(UNAUTHORIZED_MESSAGE);
+        return;
+      }
       this.logger.log(`mention: ${message.text}`);
       const result = await this.agentRegistry
         .get(EMPLOYEE_ASSISTANT)
