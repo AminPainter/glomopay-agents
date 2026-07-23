@@ -26,7 +26,7 @@ export function createEmployeeAssistant(
       ...atlassianMcpService.getTools(),
     },
     stopWhen: stepCountIs(
-      Number(configService.get('EMPLOYEE_ASSISTANT_MAX_STEPS') ?? 20),
+      Number(configService.get('EMPLOYEE_ASSISTANT_MAX_STEPS') ?? 40),
     ),
   });
 }
