@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { AiService } from '../../../ai/services/ai.service';
 import { SentryMcpService } from '../../../ai/services/sentry-mcp.service';
 import { GitHubMcpService } from '../../../ai/services/github-mcp.service';
+import { AtlassianMcpService } from '../../../ai/services/atlassian-mcp.service';
 import { RegisteredAgent } from '../../services/agent-registry.service';
 import { EMPLOYEE_ASSISTANT_SYSTEM_PROMPT } from './employee-assistant.prompt';
 
@@ -12,6 +13,7 @@ export function createEmployeeAssistant(
   aiService: AiService,
   sentryMcpService: SentryMcpService,
   gitHubMcpService: GitHubMcpService,
+  atlassianMcpService: AtlassianMcpService,
   configService: ConfigService,
 ): RegisteredAgent {
   return new ToolLoopAgent({
@@ -21,6 +23,7 @@ export function createEmployeeAssistant(
       ...aiService.webTools(),
       ...sentryMcpService.getTools(),
       ...gitHubMcpService.getTools(),
+      ...atlassianMcpService.getTools(),
     },
     stopWhen: stepCountIs(
       Number(configService.get('EMPLOYEE_ASSISTANT_MAX_STEPS') ?? 20),

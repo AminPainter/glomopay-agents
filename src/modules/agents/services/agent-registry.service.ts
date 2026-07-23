@@ -6,7 +6,9 @@ import { Agent } from 'ai';
 export type RegisteredAgent = Agent<never, any>;
 
 export class AgentRegistry {
-  constructor(private readonly agents: Map<string, RegisteredAgent> = new Map()) {}
+  constructor(
+    private readonly agents: Map<string, RegisteredAgent> = new Map(),
+  ) {}
 
   register(key: string, agent: RegisteredAgent): void {
     this.agents.set(key, agent);
