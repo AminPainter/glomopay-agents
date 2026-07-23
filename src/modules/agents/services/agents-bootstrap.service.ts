@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { AiService } from '../../ai/services/ai.service';
 import { SentryMcpService } from '../../ai/services/sentry-mcp.service';
 import { GitHubMcpService } from '../../ai/services/github-mcp.service';
+import { AtlassianMcpService } from '../../ai/services/atlassian-mcp.service';
 import { AgentRegistry } from './agent-registry.service';
 import {
   EMPLOYEE_ASSISTANT,
@@ -15,6 +16,7 @@ export class AgentsBootstrapService implements OnApplicationBootstrap {
     private readonly aiService: AiService,
     private readonly sentryMcpService: SentryMcpService,
     private readonly gitHubMcpService: GitHubMcpService,
+    private readonly atlassianMcpService: AtlassianMcpService,
     private readonly configService: ConfigService,
     private readonly agentRegistry: AgentRegistry,
   ) {}
@@ -26,6 +28,7 @@ export class AgentsBootstrapService implements OnApplicationBootstrap {
         this.aiService,
         this.sentryMcpService,
         this.gitHubMcpService,
+        this.atlassianMcpService,
         this.configService,
       ),
     );

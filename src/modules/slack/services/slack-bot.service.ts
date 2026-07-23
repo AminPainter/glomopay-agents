@@ -40,11 +40,9 @@ export class SlackBotService implements OnModuleInit {
         .stream({ prompt: message.text });
       await thread.post(result.textStream);
       const text = await result.text;
-      if (text.trim().length > 0) {
+      if (text.trim().length > 0)
         this.logger.log(`answered: ${text.length} chars`);
-      } else {
-        this.logger.warn('agent produced an empty response');
-      }
+      else this.logger.warn('agent produced an empty response');
     });
   }
 
