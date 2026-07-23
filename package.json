@@ -19,20 +19,20 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
   },
   "dependencies": {
     "@ai-sdk/mcp": "2.0.16",
     "@ai-sdk/openai-compatible": "^3.0.14",
     "@chat-adapter/slack": "^4.34.0",
     "@chat-adapter/state-memory": "^4.34.0",
-    "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "ai": "^7.0.19",
-    "bullmq": "^5.80.2",
     "chat": "^4.34.0",
     "html-to-text": "^10.0.0",
     "reflect-metadata": "^0.2.2",
@@ -83,9 +83,6 @@
     "testEnvironment": "node"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "msgpackr-extract",
-      "unrs-resolver"
-    ]
+    "onlyBuiltDependencies": []
   }
 }

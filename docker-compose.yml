@@ -1,10 +1,13 @@
 services:
-  searxng:
-    image: searxng/searxng:latest
+  app:
+    build: .
     ports:
-      - '8080:8080'
-    volumes:
-      - ./searxng:/etc/searxng:rw
+      - '51515:51515'
+      - '8080:8080' # SearXNG, exposed for local debugging only
+    env_file: .env # must include SEARXNG_SECRET
     environment:
-      - SEARXNG_BASE_URL=http://localhost:8080/
+      - PORT=51515
+      - SEARXNG_BASE_URL=http://127.0.0.1:8080
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro # iterate on config w/o rebuild
     restart: unless-stopped

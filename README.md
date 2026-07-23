@@ -1,98 +1,85 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# GlomoPay employee-assistant
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS Slack bot that answers employee questions using an LLM (via an OpenAI-compatible
+AI gateway), web search (SearXNG), and read-only MCP tools (GitHub, Atlassian/Jira, Sentry).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The app and SearXNG ship in a single Docker image: SearXNG runs on `127.0.0.1:8080` inside the
+container and the app talks to it there. One container runs both processes.
 
-## Description
+## Run locally (Docker)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+Prereqs: Docker + Docker Compose. (Node 22 / pnpm 10 only needed for non-Docker dev.)
 
 ```bash
-$ pnpm install
+cp .env.example .env      # then fill in the values below, INCLUDING SEARXNG_SECRET
+pnpm docker:up            # docker compose up --build
 ```
 
-## Compile and run the project
+- App: http://localhost:51515 (`GET /` returns a hello string — also the health check path)
+- SearXNG JSON API: http://localhost:8080/search?q=test&format=json (exposed for debugging only)
+
+Stop with `pnpm docker:down`.
+
+`docker-compose.yml` bind-mounts `searxng/settings.yml` read-only, so you can edit SearXNG
+config and restart without rebuilding.
+
+## Environment variables
+
+Set these in `.env` locally and as `sync: false` dashboard values on Render.
+
+AI gateway (required):
+- `AI_GATEWAY_API_KEY`
+- `AI_GATEWAY_BASE_URL`
+- `AI_GATEWAY_MODEL`
+
+Slack (required — the bot receives events via webhooks, so the service must be public):
+- `SLACK_BOT_TOKEN`
+- `SLACK_SIGNING_SECRET`
+- `SLACK_APP_TOKEN`, `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET` — only if your Slack app config needs them
+
+MCP tools (read-only integrations):
+- `GITHUB_PAT` (+ optional `GITHUB_MCP_URL`)
+- `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` (+ optional `ATLASSIAN_MCP_URL`)
+- `SENTRY_AUTH_TOKEN` (+ optional `SENTRY_MCP_URL`)
+
+SearXNG:
+- `SEARXNG_SECRET` (required) — SearXNG reads this natively and overrides `secret_key`. If it is
+  unset in production, SearXNG's boot guard exits with an error rather than running with a weak
+  secret, so it must be set.
+- `SEARXNG_BASE_URL` — full URL to the in-container SearXNG. Always `http://127.0.0.1:8080`
+  (set by compose and render.yaml; you don't set it in `.env`).
+
+`PORT` is injected by the platform (Render) and set to `51515` locally by compose — do not
+hardcode it in code.
+
+Note: `REDIS_HOST` / `REDIS_PORT` are no longer used (Redis/BullMQ was removed). Leftover values
+in `.env` are harmless.
+
+## Deploy to Render
+
+The repo ships a `render.yaml` blueprint: one public Docker web service in Singapore
+(`starter` plan, kept warm for Slack webhooks), running both the app and SearXNG.
+
+1. Push this repo to GitHub.
+2. In Render: New → Blueprint, connect the repo. Render reads `render.yaml`.
+3. At first sync, fill every `sync: false` secret — including `SEARXNG_SECRET`.
+4. Deploy. Confirm `/` health passes, then mention the bot in Slack and verify a
+   web-search-backed answer (proves the in-container SearXNG on `127.0.0.1:8080` works).
+
+## Non-Docker dev
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm install
+pnpm run start:dev
 ```
 
-## Run tests
+You'll need a SearXNG reachable at `SEARXNG_BASE_URL` and all env vars above set in your shell
+or `.env`.
+
+## Tests
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm test         # unit
+pnpm test:e2e     # e2e
+pnpm test:cov     # coverage
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm add -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
