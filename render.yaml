@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: glomo-employee-assistant
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: starter # 'free' cold-starts; Slack webhooks need it warm
+    healthCheckPath: /
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SEARXNG_BASE_URL
+        value: http://127.0.0.1:8080
+      # PORT is injected by Render — do not set it.
+      - key: SEARXNG_SECRET
+        sync: false
+      - key: AI_GATEWAY_API_KEY
+        sync: false
+      - key: AI_GATEWAY_BASE_URL
+        sync: false
+      - key: AI_GATEWAY_MODEL
+        sync: false
+      - key: GITHUB_PAT
+        sync: false
+      - key: ATLASSIAN_EMAIL
+        sync: false
+      - key: ATLASSIAN_API_TOKEN
+        sync: false
+      - key: SENTRY_AUTH_TOKEN
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_SIGNING_SECRET
+        sync: false
+      # Add SLACK_APP_TOKEN / *_MCP_URL as sync:false only if the populated .env needs them.

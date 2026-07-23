@@ -1,8 +1,11 @@
 use_default_settings: true
 
 server:
-  # Local dev only — set a real secret via env/secret manager before any shared deployment.
-  secret_key: 'change-me-local-dev'
+  # SearXNG overrides this with the SEARXNG_SECRET env var (settings_defaults.py,
+  # environ_name='SEARXNG_SECRET'). The literal below is only a fallback: if
+  # SEARXNG_SECRET is unset, it stays 'ultrasecretkey', which trips SearXNG's
+  # production boot guard (webapp.py: sys.exit(1)) instead of shipping a weak secret.
+  secret_key: 'ultrasecretkey'
   # Disable the anti-bot limiter so the support agent can query the JSON API.
   limiter: false
 

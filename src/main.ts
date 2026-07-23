@@ -8,6 +8,6 @@ async function bootstrap() {
     rawBody: true,
   });
   const config = app.get(ConfigService);
-  await app.listen(config.getOrThrow<string>('PORT'));
+  await app.listen(config.getOrThrow<string>('PORT'), '0.0.0.0');
 }
 bootstrap();
