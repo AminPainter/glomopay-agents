@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: glomo-employee-assistant
+    name: glomo-ai-workforce
     runtime: docker
     dockerfilePath: ./Dockerfile
     region: singapore
