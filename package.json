@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.11",
+    "@ai-sdk/mcp": "2.0.16",
     "@chat-adapter/slack": "^4.34.0",
     "@chat-adapter/state-memory": "^4.34.0",
     "@nestjs/bullmq": "^11.0.4",
