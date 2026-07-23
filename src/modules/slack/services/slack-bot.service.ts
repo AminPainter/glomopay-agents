@@ -37,7 +37,7 @@ export class SlackBotService implements OnModuleInit {
       this.logger.log(`mention: ${message.text}`);
       const result = await this.agentRegistry
         .get(EMPLOYEE_ASSISTANT)
-        .stream({ prompt: message.text });
+        .stream({ prompt: this.buildPrompt(message.text) });
       await thread.post(result.textStream);
       const text = await result.text;
       if (text.trim().length > 0)
@@ -48,5 +48,19 @@ export class SlackBotService implements OnModuleInit {
 
   get slackWebhook() {
     return this.bot.webhooks.slack;
+  }
+
+  private buildPrompt(text: string): string {
+    const now = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(new Date());
+    return `Current date/time: ${now} IST\n\n${text}`;
   }
 }
