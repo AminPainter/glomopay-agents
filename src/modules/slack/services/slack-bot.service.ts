@@ -26,7 +26,12 @@ export class SlackBotService implements OnModuleInit {
         .get(EMPLOYEE_ASSISTANT)
         .stream({ prompt: message.text });
       await thread.post(result.textStream);
-      this.logger.log(`answered:\n${await result.text}`);
+      const text = await result.text;
+      if (text.trim().length > 0) {
+        this.logger.log(`answered: ${text.length} chars`);
+      } else {
+        this.logger.warn('agent produced an empty response');
+      }
     });
   }
 
