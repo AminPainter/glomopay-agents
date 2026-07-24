@@ -33,4 +33,16 @@ services:
         sync: false
       - key: SLACK_SIGNING_SECRET
         sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: glomo-redis
+          property: connectionString
       # Add SLACK_APP_TOKEN / *_MCP_URL as sync:false only if the populated .env needs them.
+
+  - type: keyvalue
+    name: glomo-redis
+    region: singapore # match the web service region
+    plan: starter # 'free' is non-persistent + tiny; 'starter'+ persists
+    maxmemoryPolicy: noeviction # protect BullMQ jobs / Chat locks from eviction
+    ipAllowList: [] # empty = private (internal Render network only)
