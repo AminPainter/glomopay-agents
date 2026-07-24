@@ -36,12 +36,12 @@ services:
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: glomo-redis
+          name: glomo-ai-workforce-redis
           property: connectionString
       # Add SLACK_APP_TOKEN / *_MCP_URL as sync:false only if the populated .env needs them.
 
   - type: keyvalue
-    name: glomo-redis
+    name: glomo-ai-workforce-redis
     region: singapore # match the web service region
     plan: starter # 'free' is non-persistent + tiny; 'starter'+ persists
     maxmemoryPolicy: noeviction # protect BullMQ jobs / Chat locks from eviction
