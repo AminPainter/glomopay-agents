@@ -8,6 +8,13 @@ services:
     environment:
       - PORT=51515
       - SEARXNG_BASE_URL=http://127.0.0.1:8080
+      - REDIS_URL=redis://redis:6379
     volumes:
       - ./searxng/settings.yml:/etc/searxng/settings.yml:ro # iterate on config w/o rebuild
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379' # debug only
     restart: unless-stopped

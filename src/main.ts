@@ -8,6 +8,7 @@ async function bootstrap() {
     rawBody: true,
   });
   const config = app.get(ConfigService);
+  app.enableShutdownHooks();
   await app.listen(config.getOrThrow<string>('PORT'), '0.0.0.0');
 }
 bootstrap();

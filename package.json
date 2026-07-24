@@ -27,7 +27,7 @@
     "@ai-sdk/mcp": "2.0.16",
     "@ai-sdk/openai-compatible": "^3.0.14",
     "@chat-adapter/slack": "^4.34.0",
-    "@chat-adapter/state-memory": "^4.34.0",
+    "@chat-adapter/state-redis": "4.34.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
